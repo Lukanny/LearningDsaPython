@@ -39,7 +39,7 @@ solution(grid) = false.
 The given grid is not correct because there are two 1s in the second column. Each column, each row,
 and each 3 × 3 subgrid can only contain the numbers 1 through 9 one time.
 """
-
+import collections
 import unittest
 
 
@@ -83,28 +83,23 @@ class Solution(unittest.TestCase):
 
     @staticmethod
     def solution(grid):
-        for row in grid:
-            row_hashset = set()
-            for number in row:
-                if number == ".":
-                    continue
-                if number not in row_hashset:
-                    row_hashset.add(number)
-                else:
-                    return False
-        hashmap = {}
-        for i in range(0, 9):
-            for j in range(0, 9):
+        cols = collections.defaultdict(set)
+        rows = collections.defaultdict(set)
+        squares = collections.defaultdict(set)
+
+        for i in range(9):
+            for j in range(9):
                 if grid[i][j] == ".":
                     continue
-                if j not in hashmap:
-                    hashmap[j] = set()
-                    hashmap[j].add(grid[i][j])
-                else:
-                    if grid[i][j] not in hashmap[j]:
-                        hashmap[j].add(grid[i][j])
-                    else:
-                        return False
+                if (
+                        grid[i][j] in rows[i] or
+                        grid[i][j] in cols[j] or
+                        grid[i][j] in squares[(i//3, j//3)]
+                ):
+                    return False
+                cols[j].add(grid[i][j])
+                rows[i].add(grid[i][j])
+                squares[(i//3, j//3)].add(grid[i][j])
         return True
 
     def test_solution(self):
